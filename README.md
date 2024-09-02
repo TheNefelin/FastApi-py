@@ -53,44 +53,19 @@ POSTGRES_DATABASE="************"
 ```
 project
 │
-├── app
-│   ├── __init__.py
+├── app/
+│   ├── routes/
+│   │   ├── project.py
+│   │   └── public.py
+│   ├── tests/
 │   ├── main.py
-│   ├── core
-│   │   ├── __init__.py
-│   │   ├── config.py
-│   │   └── security.py
-│   ├── models
-│   │   ├── __init__.py
-│   │   └── user.py
-│   ├── schemas
-│   │   ├── __init__.py
-│   │   └── user.py
-│   ├── api
-│   │   ├── __init__.py
-│   │   ├── deps.py
-│   │   ├── v1
-│   │   │   ├── __init__.py
-│   │   │   ├── endpoints/
-│   │   │   │   ├── __init__.py
-│   │   │   │   └── user.py
-│   ├── crud
-│   │   ├── __init__.py
-│   │   └── user.py
-│   ├── db
-│   │   ├── __init__.py
-│   │   ├── base.py
-│   │   ├── base_class.py
-│   │   └── session.py
-│   ├── tests
-│   │   ├── __init__.py
-│   │   └── test_user.py
-│   └── utils
-│       ├── __init__.py
-│       └── utils.py
-│
+│   ├── models.py
+│   └── mssql.py
+├── venv/
 ├── .env
-├── alembic.ini
+├── .env.local
+├── .gitignore
+├── README.md
 ├── requirements.txt
-└── README.md
+└── vercel.json
 ```
