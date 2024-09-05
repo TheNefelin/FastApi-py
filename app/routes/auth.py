@@ -19,14 +19,22 @@ class sp_result(BaseModel):
   msge: str
 
 class Token(BaseModel):
-    access_token: str
-    token_type: str
+  access_token: str
+  token_type: str
 
 class TokenData(BaseModel):
-    username: str | None = None
+  username: str | None = None
 
 def create_access_token(data: dict):
   to_encode = data.copy()
+
+  if TOKEN_TIMEOUT is not None:
+    try:
+      expires_delta = timedelta(minutes=int(TOKEN_TIMEOUT))
+    except ValueError:
+      expires_delta = timedelta(minutes=15)  # Valor predeterminado en caso de error
+    else:
+      expires_delta = timedelta(minutes=15) 
 
   expires_delta = timedelta(minutes = int(TOKEN_TIMEOUT))
 
@@ -63,9 +71,9 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
       headers = {"WWW-Authenticate": "Bearer"},
     )
 
-  # access_token = create_access_token(data={"sub": form_data.username})
+  access_token = create_access_token(data={"sub": form_data.username})
 
-  return {"access_token": "access_token", "token_type": "bearer"}
+  return {"access_token": access_token, "token_type": "bearer"}
 
 @router.get("/me")
 async def read_users_me(token: str = Depends(oauth2_scheme)):
