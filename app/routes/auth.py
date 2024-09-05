@@ -8,7 +8,7 @@ from app.mssql import execute_sp
 
 TOKEN_SECRET_KEY = os.getenv("TOKEN_SECRET_KEY")
 TOKEN_ALGORITHM = os.getenv("TOKEN_ALGORITHM")
-TOKEN_TIMEOUT = int(os.getenv("TOKEN_TIMEOUT"))
+TOKEN_TIMEOUT = os.getenv("TOKEN_TIMEOUT")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
@@ -28,7 +28,7 @@ class TokenData(BaseModel):
 def create_access_token(data: dict):
   to_encode = data.copy()
 
-  expires_delta = timedelta(minutes = TOKEN_TIMEOUT)
+  expires_delta = timedelta(minutes = int(TOKEN_TIMEOUT))
 
   if expires_delta:
     expire = datetime.now().astimezone() + expires_delta
