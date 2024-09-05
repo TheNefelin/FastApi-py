@@ -1,5 +1,4 @@
 import pymssql
-# import psycopg2
 import os
 
 conn = pymssql.connect(
@@ -8,14 +7,6 @@ conn = pymssql.connect(
   password = os.getenv("MSSQL_PASSWORD"),
   database = os.getenv("MSSQL_DATABASE")
 )
-
-# conn = psycopg2.connect(
-#   user = os.getenv("POSTGRES_USER"),
-#   host = os.getenv("POSTGRES_HOST"),
-#   password = os.getenv("POSTGRES_PASSWORD"),
-#   database = os.getenv("POSTGRES_DATABASE"),
-#   port="5432"
-# )
 
 async def execute_query(query):
   try:
