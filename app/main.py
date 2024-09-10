@@ -13,4 +13,4 @@ async def root():
 
 app.include_router(auth.router)
 app.include_router(public.router)
-app.include_router(project.router)
+app.include_router(project.router, dependencies=[Depends(auth.oauth2_scheme)])

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from jose import JWTError, jwt
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from pydantic import BaseModel
 import os
 from app.mssql import execute_sp
@@ -19,6 +19,7 @@ class sp_result(BaseModel):
   msge: str
 
 class Token(BaseModel):
+  session_code: str
   access_token: str
   token_type: str
 
@@ -35,26 +36,27 @@ def create_access_token(data: dict):
   else:
     expire = datetime.now().astimezone() + timedelta(minutes = 15)
   
-  to_encode.update({"exp": expire})
+  data.update({"exp": expire})
   encoded_jwt = jwt.encode(to_encode, TOKEN_SECRET_KEY, algorithm = TOKEN_ALGORITHM)
   return encoded_jwt
 
-# Function to verify the token and extract user information
 def verify_token(token: str, credentials_exception):
-    try:
-        payload = jwt.decode(token, TOKEN_SECRET_KEY, algorithms=[TOKEN_ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
-            raise credentials_exception
-        token_data = TokenData(username=username)
-    except JWTError:
-        raise credentials_exception
-    return token_data
+  try:
+    payload = jwt.decode(token, TOKEN_SECRET_KEY, algorithms=[TOKEN_ALGORITHM])
+    username: str = payload.get("sub")
+    
+    if username is None:
+      raise credentials_exception
+    
+    token_data = TokenData(username=username)
+  except JWTError:
+    raise credentials_exception
+  return token_data
 
 @router.post("/login", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
   result = await execute_sp("PY_Login", (form_data.username, form_data.password,))
-  code, msge = result[0]['StatusCode'], result[0]['Msge']
+  code, session, msge = result[0]['StatusCode'], result[0]['SessionCode'], result[0]['Msge']
 
   if code != 201:
     raise HTTPException(
@@ -64,8 +66,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     )
 
   access_token = create_access_token(data={"sub": form_data.username})
-
-  return {"access_token": access_token, "token_type": "bearer"}
+  return {"session_code" : session , "access_token": access_token, "token_type": "bearer"}
 
 @router.get("/me")
 async def read_users_me(token: str = Depends(oauth2_scheme)):
